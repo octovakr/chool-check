@@ -14,6 +14,7 @@ class _HomeScreenState extends State<HomeScreen> {
     target: LatLng(37.5214, 126.9246),
     zoom: 15,
   );
+  late final GoogleMapController controller;
 
   checkPermission() async {
     final isLocationEnabled = await Geolocator.isLocationServiceEnabled();
@@ -35,6 +36,23 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        centerTitle: true, // (안드로이드) title 텍스트 가운데 정렬
+        title: Text(
+          '오늘도 출근',
+          style: TextStyle(
+            color: Colors.blue,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        actions: [
+          IconButton(
+            onPressed: myLocationPressed,
+            icon: Icon(Icons.my_location),
+            color: Colors.blue,
+          )
+        ],
+      ),
       body: FutureBuilder(
           future: checkPermission(),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
@@ -48,6 +66,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 Expanded(
                   child: GoogleMap(
                     initialCameraPosition: initialPosition,
+                    // mapType: MapType.normal,
+                    myLocationEnabled: true, // 내 위치를 표시함.
+                    myLocationButtonEnabled: false, // 내 위치로 가기 버튼을 없앰.
+                    zoomControlsEnabled: false, // (안드로이드) 줌 버튼을 없앰.
+                    // GoogleMap 위젯으로 가기 해보면 다양한 옵션 확인 가능
+                    onMapCreated: (GoogleMapController controller) {
+                      this.controller = controller;
+                    },
                   ),
                 ),
               ],
@@ -56,4 +82,14 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
+  myLocationPressed() async {
+    final location = await Geolocator.getCurrentPosition();
+    controller.animateCamera(
+        CameraUpdate.newLatLng(
+          LatLng(location.latitude, location.longitude),
+        ),
+    );
+  }
+
 }
