@@ -33,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     if (checkedPermission != LocationPermission.always
-    || checkedPermission != LocationPermission.whileInUse) {
+    && checkedPermission != LocationPermission.whileInUse) {
       throw Exception("위치 권한을 허가해주세요.");
     }
   }
