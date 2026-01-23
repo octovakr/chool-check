@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -14,6 +15,9 @@ class _HomeScreenState extends State<HomeScreen> {
     target: LatLng(37.5214, 126.9246),
     zoom: 15,
   );
+
+  bool choolCheckDone = false;
+
   late final GoogleMapController controller;
 
   checkPermission() async {
@@ -64,6 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
             return Column(
               children: [
                 Expanded(
+                  flex: 2,
                   child: GoogleMap(
                     initialCameraPosition: initialPosition,
                     // mapType: MapType.normal,
@@ -92,11 +97,68 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                   ),
                 ),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        choolCheckDone ? Icons.check : Icons.timelapse_outlined,
+                        color: choolCheckDone ? Colors.green : Colors.blue,
+                      ),
+                      SizedBox(height: 16.0),
+                      if (!choolCheckDone)
+                        OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.blue,
+                          ),
+                          onPressed: choolCheckPressed,
+                          child: Text('출근하기'),
+                        )
+                    ],
+                  ),
+                )
               ],
             );
           }
       ),
     );
+  }
+
+  choolCheckPressed() async {
+    final result = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: Text('출근하기'),
+          content: Text('출근을 하시겠습니까?'),
+          actions: [
+            TextButton(
+              onPressed: (){
+                Navigator.of(context).pop(false); // dialog도 하나의 페이지다.
+              },
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.red,
+              ),
+              child: Text('취소'),
+            ),
+            TextButton(
+              onPressed: (){
+                Navigator.of(context).pop(true);
+              },
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.blue,
+              ),
+              child: Text('출근하기'),
+            )
+          ],
+        );
+      }
+    );
+    if (result) {
+      setState(() {
+        choolCheckDone = result;
+      });
+    }
   }
 
   myLocationPressed() async {
